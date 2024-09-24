@@ -1,8 +1,4 @@
-﻿  Cliente.cpp
-  LectorDB.cpp
-  Plato.cpp
-  pc.cpp
-D:\c++\pc\pc\pc.cpp(30,87): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
-D:\c++\pc\pc\pc.cpp(75,39): warning C4267: 'argumento': conversión de 'size_t' a 'int'; posible pérdida de datos
-  Generando código...
+﻿  pc.cpp
+D:\c++\pc\pc\pc.cpp(32,87): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+D:\c++\pc\pc\pc.cpp(81,39): warning C4267: 'argumento': conversión de 'size_t' a 'int'; posible pérdida de datos
   pc.vcxproj -> D:\c++\pc\x64\Debug\pc.exe

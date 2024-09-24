@@ -24,10 +24,16 @@ int main() {
 
     // Leer datos iniciales desde los archivos
     vector<Cliente> clientes = lector.leerClientes("dbClientes.txt");
-    vector<Plato> platos = lector.leerPlatos("dbPlatos.txt");
+    vector<Plato<string>> platos = lector.leerPlatos("dbPlatos.txt");
 
-    for (Plato plato : platos) {
+
+    //lambda 1
+    auto agregarPlatoLista = [&listaProducto](Plato<string>& plato) {
         listaProducto.agregarInicial(plato.getId(), plato.getNombre(), plato.getPrecio(), "Comida");
+    };
+
+    for (Plato<string>& plato : platos) {
+        agregarPlatoLista(plato);
     }
 
     int opcion;
@@ -61,8 +67,9 @@ void mostrarMenu() {
     cout << "2. Lista de Platos" << endl;
     cout << "3. Generar Informes" << endl;
     cout << "4. Salir" << endl;
-    cout << "Selecciona una opción: ";
+    cout << "Selecciona una opcion: ";
 }
+
 
 void registrarPedido(LectorDB& lector, ListaProducto& listaProducto, vector<Pedido>& pedidos) {
     cout << "\nRegistrar Pedido" << endl;
@@ -71,7 +78,6 @@ void registrarPedido(LectorDB& lector, ListaProducto& listaProducto, vector<Pedi
     cout << "Ingrese el nombre del cliente: ";
     cin.ignore();
     getline(cin, nombreCliente);
-
     Pedido nuevoPedido(pedidos.size() + 1, nombreCliente, new ListaProducto());
 
     char continuar;
@@ -140,9 +146,10 @@ void gestionarPlatos(ListaProducto& listaProducto) {
         eliminarPlato(listaProducto);
         break;
     default:
-        cout << "Opción no válida." << endl;
+        cout << "Opcion no valida." << endl;
     }
 }
+
 
 void modificarPrecio(ListaProducto& listaProducto) {
     cout << "Modificar Precio" << endl;
@@ -153,9 +160,18 @@ void modificarPrecio(ListaProducto& listaProducto) {
     cout << "Nuevo Precio: ";
     cin >> nuevoPrecio;
 
-    Producto* producto = listaProducto.obtenerProducto(id);
-    if (producto != nullptr) {
-        producto->precio = nuevoPrecio;
+    // Lambda 2
+    auto modificarPrecioLambda = [&listaProducto](int id, float nuevoPrecio) {
+        Producto* producto = listaProducto.obtenerProducto(id);
+        if (producto != nullptr) {
+            producto->precio = nuevoPrecio;
+            return true;  // Precio modificado con éxito
+        }
+        return false;  // Plato no encontrado
+        };
+
+    // Usamos la lambda para intentar modificar el precio
+    if (modificarPrecioLambda(id, nuevoPrecio)) {
         cout << "Precio modificado correctamente." << endl;
     }
     else {
@@ -182,7 +198,7 @@ void agregarPlato(ListaProducto& listaProducto) {
 
     listaProducto.agregarInicial(id, nombre, precio, categoria);
     cout << "Plato agregado correctamente." << endl;
-}
+};
 
 void eliminarPlato(ListaProducto& listaProducto) {
     cout << "Eliminar Plato" << endl;
@@ -190,9 +206,24 @@ void eliminarPlato(ListaProducto& listaProducto) {
     cout << "ID del Plato: ";
     cin >> id;
 
-    listaProducto.eliminarProducto(id);
-    cout << "Plato eliminado correctamente." << endl;
-}
+    // Lambda para eliminar el plato
+    auto eliminarPlatoLambda = [&listaProducto](int id) {
+        Producto* producto = listaProducto.obtenerProducto(id);
+        if (producto != nullptr) {
+            listaProducto.eliminarProducto(id);
+            return true;  // Plato eliminado con éxito
+        }
+        return false;  // Plato no encontrado
+        };
+
+    // Usamos la lambda para intentar eliminar el plato
+    if (eliminarPlatoLambda(id)) {
+        cout << "Plato eliminado correctamente." << endl;
+    }
+    else {
+        cout << "Plato no encontrado." << endl;
+    }
+};
 
 void generarInformes(vector<Pedido>& pedidos, LectorDB& lector) {
     cout << "\nGenerar Informes" << endl;
@@ -202,6 +233,7 @@ void generarInformes(vector<Pedido>& pedidos, LectorDB& lector) {
 
     int opcion;
     cin >> opcion;
+
 
     switch (opcion) {
     case 1:
@@ -218,22 +250,47 @@ void generarInformes(vector<Pedido>& pedidos, LectorDB& lector) {
     }
 }
 
+//recursividad 1
+void verHistorialPedidosRecursivo(vector<Pedido>& pedidos, int index) {
+    if (index >= pedidos.size()) {  // Caso base: cuando llegamos al final de la lista
+        return;
+    }
+    pedidos[index].mostrarPedido();  // Mostrar el pedido actual
+    verHistorialPedidosRecursivo(pedidos, index + 1);  // Llamada recursiva para el siguiente pedido
+}
+
 void verHistorialPedidos(vector<Pedido>& pedidos) {
     cout << "\nHistorial de Pedidos" << endl;
     if (pedidos.empty()) {
         cout << "No hay pedidos registrados." << endl;
         return;
     }
-    for (Pedido& pedido : pedidos) {
-        pedido.mostrarPedido();
+    verHistorialPedidosRecursivo(pedidos, 0);  // Comenzamos con el índice 0
+}
+
+//recursividad 2
+void verPlatosDemandadosRecursivo(const vector<string>& platos, int index) { 
+    if (index >= platos.size()) {  // Caso base: cuando llegamos al final de la lista
+        return;
     }
+    cout << index + 1 << ". " << platos[index] << endl;  // Mostrar el plato actual
+    verPlatosDemandadosRecursivo(platos, index + 1);  // Llamada recursiva para el siguiente plato
 }
 
 void verPlatosDemandados() {
-    cout << "\nPlatos Más Demandados" << endl;
-    cout << "1. Pollo a la Brasa" << endl;
-    cout << "2. Arroz con Pollo" << endl;
-    cout << "3. Broaster" << endl;
+    cout << "\nPlatos Mas Demandados" << endl;
+    vector<string> platos = { "Pollo a la Brasa", "Arroz con Pollo", "Broaster" };  // Lista de platos
+    verPlatosDemandadosRecursivo(platos, 0);  // Comenzamos con el índice 0
+}
+
+
+//recursividad 3
+void verHistorialClientesRecursivo(vector<Cliente>& clientes, int index) {
+    if (index >= clientes.size()) {  // Caso base: cuando llegamos al final de la lista
+        return;
+    }
+    cout << "ID: " << clientes[index].getId() << ", Nombre: " << clientes[index].getNombre() << ", Edad: " << clientes[index].getEdad() << endl;
+    verHistorialClientesRecursivo(clientes, index + 1);  // Llamada recursiva para el siguiente cliente
 }
 
 void verHistorialClientes(LectorDB& lector) {
@@ -243,9 +300,7 @@ void verHistorialClientes(LectorDB& lector) {
         cout << "No hay clientes registrados." << endl;
         return;
     }
-    for (Cliente cliente : clientes) {
-        cout << "ID: " << cliente.getId() << ", Nombre: " << cliente.getNombre() << ", Edad: " << cliente.getEdad() << endl;
-    }
+    verHistorialClientesRecursivo(clientes, 0);  // Comenzamos con el índice 0
 }
 
 

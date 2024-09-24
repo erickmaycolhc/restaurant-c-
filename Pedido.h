@@ -1,6 +1,6 @@
 #pragma once
 #include "ListaProducto.h"
-
+#include <string>
 class Pedido {
 public:
     int id;
@@ -38,21 +38,3 @@ void Pedido::agregarProductos(int id, ListaProducto* productosLista) {
 }
 
 
-//template <typename T>
-//void imprimirVector(const std::vector<T>& vec) {
-//    for (const auto& elem : vec) {
-//        std::cout << elem << std::endl;
-//    }
-//}
-//
-//// Plantilla 2: Función para buscar un elemento en un vector
-//template <typename T>
-//bool buscarElemento(const std::vector<T>& vec, const T& elemento) {
-//    return std::find(vec.begin(), vec.end(), elemento) != vec.end();
-//}
-//
-//// Plantilla 3: Función para obtener el máximo de un vector
-//template <typename T>
-//T obtenerMaximo(const std::vector<T>& vec) {
-//    return *std::max_element(vec.begin(), vec.end());
-//}
